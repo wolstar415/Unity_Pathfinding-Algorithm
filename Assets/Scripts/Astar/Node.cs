@@ -15,12 +15,9 @@ public class Node
         get { return gCost + hCost; }
     }
 
-    //public bool isWall;
-
-    public Node(int _gridX,int _gridY)
+    public Node(int _gridX, int _gridY)
     {
         gridX = _gridX;
         gridY = _gridY;
     }
-    
 }

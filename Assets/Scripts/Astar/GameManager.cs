@@ -19,10 +19,9 @@ public class GameManager : MonoBehaviour
     }
 
     public int mapMaxX { get; private set; }
-    public int mapMaxY{ get; private set; }
-    public int mapMinX{ get; private set; }
-    public int mapMinY{ get; private set; }
-    
-    public Tilemap tilemap;
+    public int mapMaxY { get; private set; }
+    public int mapMinX { get; private set; }
+    public int mapMinY { get; private set; }
 
+    public Tilemap tilemap;
 }

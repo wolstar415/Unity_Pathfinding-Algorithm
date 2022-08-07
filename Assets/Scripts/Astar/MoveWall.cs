@@ -10,7 +10,7 @@ public class MoveWall : MonoBehaviour
 
     private Vector2Int movePos;
     private bool b = false;
-    
+
     void Start()
     {
         startPos = Vector2Int.FloorToInt(transform.position);
@@ -22,7 +22,7 @@ public class MoveWall : MonoBehaviour
     {
         transform.position = Vector2.MoveTowards(transform.position, movePos, speed * Time.deltaTime);
 
-        if (Vector2.Distance(movePos,transform.position)<=0.1f)
+        if (Vector2.Distance(movePos, transform.position) <= 0.1f)
         {
             if (b == false)
             {
@@ -32,6 +32,7 @@ public class MoveWall : MonoBehaviour
             {
                 movePos = startPos + dirPos;
             }
+
             b = !b;
         }
     }
