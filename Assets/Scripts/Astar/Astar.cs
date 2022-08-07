@@ -17,9 +17,10 @@ public class Astar
     public AstarOption option;
 
     public List<Node> finalNodeList = new List<Node>();
-
-    public List<Node> openNodeList = new List<Node>();
-    public List<Node> closeNodeList = new List<Node>();
+    //public List<Node> openNodeList = new List<Node>();
+    PriorityQueue< Node, int > openNodeQueue = new PriorityQueue< Node, int >();
+    public PriorityQueue< Node, int > closeNodeQueue = new PriorityQueue< Node, int >();
+    //public List<Node> closeNodeList = new List<Node>();
 
     public Node startNode;
     public Node currentNode;
@@ -31,34 +32,86 @@ public class Astar
 
     public Astar(Vector3Int _startPos, Vector3Int _endPos, AstarOption _option = AstarOption.None)
     {
+        if (_startPos == _endPos)
+        {
+            return;
+        }
         startPos = _startPos;
-        endPos = _endPos;
+        
+        endPos = endCheck(_endPos);//목표지점을 갈 수 있는지 체크
         option = _option;
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = (Mathf.Abs(startNode.gridX - endPos.x) + Mathf.Abs(startNode.gridY - endPos.y)) * 10;
         nodeCheck.Add(new Vector2Int(startPos.x, startPos.y), startNode);
-
-        openNodeList.Add(startNode);
-
+        openNodeQueue.push(startNode,0);
         Find();
     }
+
+    #region 목표지점을 갈 수 있는지 체크
+
+    private Vector3Int endCheck(Vector3Int check)
+    {
+        PriorityQueue< Node, int > checkQueue = new PriorityQueue< Node, int >();
+
+        Node cur = new Node(check.x, check.y);
+        Dictionary<Vector2Int, Node> check2 = new Dictionary<Vector2Int, Node>();
+
+            checkQueue.push(cur,0);
+            check2.Add(new Vector2Int(cur.gridX,cur.gridY),cur);
+            while (!checkQueue.isEmpty())
+            {
+                cur = checkQueue.pop();
+                if (Physics2D.OverlapCircle(new Vector2(cur.gridX, cur.gridY), 0.4f, GameManager.inst.wallLayerMask))
+                {
+                    if (!check2.ContainsKey(new Vector2Int(cur.gridX - 1, cur.gridY)))
+                    {
+                        Node left = new Node(cur.gridX - 1, cur.gridY);
+                        left.hCost = (Mathf.Abs(startPos.x - left.gridX) + Mathf.Abs(startPos.y - left.gridY)) * 10;
+                        checkQueue.push(left,left.hCost);
+                        check2.Add(new Vector2Int(left.gridX,left.gridY),left);
+                    }
+                    if (!check2.ContainsKey(new Vector2Int(cur.gridX + 1, cur.gridY)))
+                    {
+                        Node right = new Node(cur.gridX + 1, cur.gridY);
+                        right.hCost = (Mathf.Abs(startPos.x - right.gridX) + Mathf.Abs(startPos.y - right.gridY)) * 10;
+                        checkQueue.push(right,right.hCost);
+                        check2.Add(new Vector2Int(right.gridX,right.gridY),right);
+                    }
+                    if (!check2.ContainsKey(new Vector2Int(cur.gridX , cur.gridY+1)))
+                    {
+                        Node up = new Node(cur.gridX , cur.gridY+1);
+                        up.hCost = (Mathf.Abs(startPos.x - up.gridX) + Mathf.Abs(startPos.y - up.gridY)) * 10;
+                        checkQueue.push(up,up.hCost);
+                        check2.Add(new Vector2Int(up.gridX,up.gridY),up);
+                    }
+                    if (!check2.ContainsKey(new Vector2Int(cur.gridX, cur.gridY-1)))
+                    {
+                        Node down = new Node(cur.gridX , cur.gridY-1);
+                        down.hCost = (Mathf.Abs(startPos.x - down.gridX) + Mathf.Abs(startPos.y - down.gridY)) * 10;
+                        checkQueue.push(down,down.hCost);
+                        check2.Add(new Vector2Int(down.gridX,down.gridY),down);
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+
+            return new Vector3Int(cur.gridX, cur.gridY);
+    }
+
+    #endregion
+    
 
 
     private void Find()
     {
-        while (openNodeList.Count > 0)
+        while (!openNodeQueue.isEmpty())
         {
-            currentNode = openNodeList[0];
-            for (int i = 0; i < openNodeList.Count; i++)
-            {
-                if (openNodeList[i].fCost <= currentNode.fCost && openNodeList[i].hCost < currentNode.hCost)
-                {
-                    currentNode = openNodeList[i];
-                }
-            }
-
-            openNodeList.Remove(currentNode);
-            closeNodeList.Add(currentNode);
+            currentNode = openNodeQueue.pop();
+            closeNodeQueue.push(currentNode,currentNode.hCost);
 
             if (currentNode.gridX == endPos.x && currentNode.gridY == endPos.y)
             {
@@ -95,17 +148,9 @@ public class Astar
         }
 
         if (endNode == null)
+            //없을경우 가장 가까운 거리로 설정
         {
-            Node checkNode = closeNodeList[0];
-            for (int i = 0; i < closeNodeList.Count; i++)
-            {
-                if (closeNodeList[i].hCost < checkNode.hCost)
-                {
-                    checkNode = closeNodeList[i];
-                }
-            }
-
-
+            Node checkNode = closeNodeQueue.pop();
             endNode = checkNode;
             while (checkNode != startNode)
             {
@@ -168,7 +213,7 @@ public class Astar
                           (currentNode.gridX - checkX == 0 || currentNode.gridY - checkY == 0 ? 10 : 14);
         checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
         checkNode.parentNode = currentNode;
-        openNodeList.Add(checkNode);
+        openNodeQueue.push(checkNode,checkNode.fCost);
         nodeCheck.Add(new Vector2Int(checkX, checkY), checkNode);
     }
 }

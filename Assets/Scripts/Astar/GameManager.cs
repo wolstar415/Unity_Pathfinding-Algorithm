@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager inst;
     public LayerMask dontMoveLayerMask;
+    public LayerMask wallLayerMask;
 
     private void Awake()
     {

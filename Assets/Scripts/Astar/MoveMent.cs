@@ -59,7 +59,7 @@ public class MoveMent : MonoBehaviour
     [ContextMenu("MovePos")]
     void MovePos()
     {
-        MoveCo = StartCoroutine(Co_Move(movePos));
+        MoveCo = StartCoroutine(Co_Move());
     }
 
     private void Update()
@@ -82,10 +82,14 @@ public class MoveMent : MonoBehaviour
         }
     }
 
-    IEnumerator Co_Move(Vector2Int endPos)
+    IEnumerator Co_Move()
     {
-        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(endPos.x, endPos.y), option);
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
         moveNode = aStar.finalNodeList;
+        movePos=(Vector2Int)aStar.endPos;
+        sw.Stop();
         if (moveNode.Count <= 1)
         {
             MoveCo = null;
@@ -106,9 +110,14 @@ public class MoveMent : MonoBehaviour
             if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.01f)
             {
                 transform.position = new Vector3(moveNode[1].gridX, moveNode[1].gridY);
-                aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(endPos.x, endPos.y),
+                if (transform.position == new Vector3Int(movePos.x,movePos.y))
+                {
+                    break;
+                }
+                aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
                     option);
                 moveNode = aStar.finalNodeList;
+                movePos=(Vector2Int)aStar.endPos;
                 if (moveNode.Count <= 1)
                 {
                     break;
@@ -125,6 +134,8 @@ public class MoveMent : MonoBehaviour
 
         ani.SetBool(IsMoving, false);
         MoveCo = null;
+        moveNode.Clear();
+        aStar = null;
     }
 
     void OnDrawGizmos()
