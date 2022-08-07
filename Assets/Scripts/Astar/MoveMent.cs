@@ -94,6 +94,7 @@ public class MoveMent : MonoBehaviour
         moveNode = aStar.finalNodeList;
         if (moveNode.Count <= 1)
         {
+            moveCo = null;
             yield break;
         }
 
@@ -108,7 +109,7 @@ public class MoveMent : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position,
                 new Vector3(moveNode[1].gridX, moveNode[1].gridY), Time.deltaTime * moveSpeed);
             
-            if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.1f)
+            if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.01f)
             {
                 transform.position = new Vector3(moveNode[1].gridX, moveNode[1].gridY);
                 aStar = new Astar(Vector3Int.FloorToInt(transform.position),new Vector3Int(endPos.x,endPos.y),option);
