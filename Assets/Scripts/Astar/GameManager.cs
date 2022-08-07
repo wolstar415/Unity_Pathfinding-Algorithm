@@ -19,9 +19,13 @@ public class GameManager : MonoBehaviour
         mapMaxY = tilemap.cellBounds.yMax - 1;
     }
 
+    [field: SerializeField]
     public int mapMaxX { get; private set; }
+    [field: SerializeField]
     public int mapMaxY { get; private set; }
+    [field: SerializeField]
     public int mapMinX { get; private set; }
+    [field: SerializeField]
     public int mapMinY { get; private set; }
 
     public Tilemap tilemap;
