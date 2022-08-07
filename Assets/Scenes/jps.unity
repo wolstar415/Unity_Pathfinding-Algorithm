@@ -158,6 +158,10 @@ MonoBehaviour:
   wallLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  <mapMaxX>k__BackingField: 0
+  <mapMaxY>k__BackingField: 0
+  <mapMinX>k__BackingField: 0
+  <mapMinY>k__BackingField: 0
   tilemap: {fileID: 768986966}
 --- !u!4 &65928489
 Transform:
@@ -586,6 +590,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -597,11 +603,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -971,6 +972,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -982,11 +985,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -8572,6 +8570,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -8583,11 +8583,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -8819,6 +8814,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -8830,11 +8827,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -8912,7 +8904,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  dirPos: {x: -2, y: 2}
+  dirPos: {x: 2, y: 2}
 --- !u!212 &1268452491
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9246,6 +9238,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -9257,11 +9251,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -9421,6 +9410,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -9432,11 +9423,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -9596,6 +9582,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -9607,11 +9595,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -9771,6 +9754,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -9782,11 +9767,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0
@@ -9946,6 +9926,8 @@ MonoBehaviour:
     endPos: {x: 0, y: 0, z: 0}
     option: 0
     finalNodeList: []
+    openNodeList: []
+    closeNodeList: []
     startNode:
       gridX: 0
       gridY: 0
@@ -9957,11 +9939,6 @@ MonoBehaviour:
       gCost: 0
       hCost: 0
     endNode:
-      gridX: 0
-      gridY: 0
-      gCost: 0
-      hCost: 0
-    nextNode:
       gridX: 0
       gridY: 0
       gCost: 0

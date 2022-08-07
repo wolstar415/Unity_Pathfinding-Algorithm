@@ -25,7 +25,6 @@ public class Astar
     public Node startNode;
     public Node currentNode;
     public Node endNode;
-    public Node nextNode;
 
     public Dictionary<Vector2Int, Node> nodeCheck = new Dictionary<Vector2Int, Node>();
 
@@ -39,6 +38,7 @@ public class Astar
         startPos = _startPos;
         
         endPos = endCheck(_endPos);//목표지점을 갈 수 있는지 체크
+        //endPos = _endPos;//목표지점을 갈 수 있는지 체크
         option = _option;
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = (Mathf.Abs(startNode.gridX - endPos.x) + Mathf.Abs(startNode.gridY - endPos.y)) * 10;
@@ -132,9 +132,8 @@ public class Astar
                 }
             }
 
-            openNodeList.Remove(currentNode);
             closeNodeList.Add(currentNode);
-            //closeNodeQueue.push(currentNode,currentNode.hCost);
+            openNodeList.Remove(currentNode);
 
             if (currentNode.gridX == endPos.x && currentNode.gridY == endPos.y)
             {
@@ -148,11 +147,6 @@ public class Astar
 
                 finalNodeList.Add(startNode);
                 finalNodeList.Reverse();
-                if (finalNodeList.Count > 1)
-                {
-                    nextNode = finalNodeList[1];
-                }
-
                 break;
             }
 
@@ -207,16 +201,16 @@ public class Astar
         }
 
 
-        if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.4f, GameManager.inst.dontMoveLayerMask))
+        if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.3f, GameManager.inst.dontMoveLayerMask))
         {
             return;
         }
 
         if (cross && option != AstarOption.None)
         {
-            if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
+            if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.3f,
                     GameManager.inst.dontMoveLayerMask) &&
-                Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.2f,
+                Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.3f,
                     GameManager.inst.dontMoveLayerMask))
             {
                 return;
@@ -224,13 +218,13 @@ public class Astar
 
             if (option == AstarOption.AllowDiagonal_DontCross)
             {
-                if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
+                if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.3f,
                         GameManager.inst.dontMoveLayerMask))
                 {
                     return;
                 }
 
-                if (Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
+                if (Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.3f,
                         GameManager.inst.dontMoveLayerMask))
                 {
                     return;
