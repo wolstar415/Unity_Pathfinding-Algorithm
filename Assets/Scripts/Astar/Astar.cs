@@ -27,7 +27,7 @@ public class Astar
     public Node endNode;
 
     public Dictionary<Vector2Int, Node> nodeCheck = new Dictionary<Vector2Int, Node>();
-
+    
 
     public Astar(Vector3Int _startPos, Vector3Int _endPos, AstarOption _option = AstarOption.None)
     {
@@ -201,16 +201,17 @@ public class Astar
         }
 
 
-        if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.3f, GameManager.inst.dontMoveLayerMask))
+        
+        if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.4f, GameManager.inst.dontMoveLayerMask))
         {
             return;
         }
 
         if (cross && option != AstarOption.None)
         {
-            if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.3f,
+            if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
                     GameManager.inst.dontMoveLayerMask) &&
-                Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.3f,
+                Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
                     GameManager.inst.dontMoveLayerMask))
             {
                 return;
@@ -218,13 +219,13 @@ public class Astar
 
             if (option == AstarOption.AllowDiagonal_DontCross)
             {
-                if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.3f,
+                if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
                         GameManager.inst.dontMoveLayerMask))
                 {
                     return;
                 }
 
-                if (Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.3f,
+                if (Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
                         GameManager.inst.dontMoveLayerMask))
                 {
                     return;
@@ -238,7 +239,6 @@ public class Astar
         checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
         checkNode.parentNode = currentNode;
         openNodeList.Add(checkNode);
-        //openNodeQueue.push(checkNode,checkNode.fCost);
         nodeCheck.Add(new Vector2Int(checkX, checkY), checkNode);
     }
 }

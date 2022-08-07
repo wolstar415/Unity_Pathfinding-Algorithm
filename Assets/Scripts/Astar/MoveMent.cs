@@ -22,6 +22,8 @@ public class MoveMent : MonoBehaviour
     public Coroutine MoveCo;
     public AstarOption option;
     public Astar aStar;
+    public bool bugCheck = false;
+
 
     [ContextMenu("PosSet")]
     void PosSet()
@@ -84,10 +86,10 @@ public class MoveMent : MonoBehaviour
 
     IEnumerator Co_Move()
     {
-
+        bugCheck = false;
         aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
         moveNode = aStar.finalNodeList;
-        movePos=(Vector2Int)aStar.endPos;
+        movePos = (Vector2Int)aStar.endPos;
         if (moveNode.Count <= 1)
         {
             MoveCo = null;
@@ -100,6 +102,7 @@ public class MoveMent : MonoBehaviour
             .normalized;
         ani.SetFloat(Horizontal, dir.x);
         ani.SetFloat(Vertical, dir.y);
+        yield return null;
         do
         {
             transform.position = Vector3.MoveTowards(transform.position,
@@ -108,17 +111,39 @@ public class MoveMent : MonoBehaviour
             if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.01f)
             {
                 transform.position = new Vector3(moveNode[1].gridX, moveNode[1].gridY);
-                if (transform.position == new Vector3Int(movePos.x,movePos.y))
+                if (transform.position == new Vector3Int(movePos.x, movePos.y))
                 {
                     break;
                 }
+
                 aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
                     option);
                 moveNode = aStar.finalNodeList;
-                movePos=(Vector2Int)aStar.endPos;
+                movePos = (Vector2Int)aStar.endPos;
                 if (moveNode.Count <= 1)
                 {
-                    break;
+                    #region  버그방지
+                    //목표지점에 못갔는데 딴 플레이어의 이동때문에 이동경로가 막혀서 멈춰있을 때 버그 방지용
+                    if (bugCheck == false && transform.position != new Vector3Int(movePos.x, movePos.y))
+                    {
+                        ani.SetBool(IsMoving, false);
+                        yield return new WaitForSeconds(1f);
+                        ani.SetBool(IsMoving, true);
+                        bugCheck = true;
+                        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
+                            option);
+                        moveNode = aStar.finalNodeList;
+                        movePos = (Vector2Int)aStar.endPos;
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    
+
+                    #endregion
+                    
                 }
 
                 dir = new Vector2(moveNode[1].gridX - moveNode[0].gridX, moveNode[1].gridY - moveNode[0].gridY)
