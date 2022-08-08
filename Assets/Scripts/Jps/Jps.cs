@@ -52,7 +52,7 @@ public class Jps
                 break;
             }
 
-            //OpenListAdd(currentNode, new Vector2Int(1, 0));
+            //Right(currentNode, new Vector2Int(1, 0));
 
 
         }
@@ -60,7 +60,7 @@ public class Jps
         
     }
     
-    // private bool OpenListAdd(Node _currentNode,Vector2Int direction)
+    // private bool Right(Node _startNode)
     //     {
     //         int x = _currentNode.gridX+direction.x;
     //         int y = _currentNode.gridY;
