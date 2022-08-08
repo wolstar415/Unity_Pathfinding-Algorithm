@@ -18,7 +18,7 @@ public class MoveMent_Astar : MonoBehaviour
     public AstarOption option;
     public Astar aStar;
     public int bugCheck = 0;
-
+    public int[,] addCost;
 
     [ContextMenu("PosSet")]
     void PosSet()
@@ -82,7 +82,8 @@ public class MoveMent_Astar : MonoBehaviour
     IEnumerator Co_Move()
     {
         bugCheck = 0;
-        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
+        addCost = new int[GameManager.inst.sizeX, GameManager.inst.sizeY];
+        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),addCost, option);
         moveNode = aStar.finalNodeList;
         movePos = (Vector2Int)aStar.endPos;
         if (moveNode.Count <= 1)
@@ -106,12 +107,13 @@ public class MoveMent_Astar : MonoBehaviour
             if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.01f)
             {
                 transform.position = new Vector3(moveNode[1].gridX, moveNode[1].gridY);
+                addCost[(int)transform.position.x-GameManager.inst.mapMinX, (int)transform.position.y-GameManager.inst.mapMinY] += 10;
                 if (transform.position == new Vector3Int(movePos.x, movePos.y))
                 {
                     break;
                 }
 
-                aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
+                aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),addCost,
                     option);
                 moveNode = aStar.finalNodeList;
                 movePos = (Vector2Int)aStar.endPos;
@@ -127,7 +129,7 @@ public class MoveMent_Astar : MonoBehaviour
                         ani.SetBool(IsMoving, true);
                         bugCheck++;
                         aStar = new Astar(Vector3Int.FloorToInt(transform.position),
-                            new Vector3Int(movePos.x, movePos.y),
+                            new Vector3Int(movePos.x, movePos.y),addCost,
                             option);
                         moveNode = aStar.finalNodeList;
                         movePos = (Vector2Int)aStar.endPos;

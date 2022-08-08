@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 [System.Serializable]
 public class Jps
@@ -17,9 +18,11 @@ public class Jps
     readonly int _moveDiagonalCost = 14;
 
     public Node[,] nodeArray;
+    public int[,] addCost;
 
-    public Jps(Vector3Int _startPos, Vector3Int _endPos)
+    public Jps(Vector3Int _startPos, Vector3Int _endPos,int[,] _addCost)
     {
+        addCost = _addCost;
         nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
         startPos = _startPos;
         endPos = EndPosCheck(_endPos);
@@ -33,6 +36,7 @@ public class Jps
         openNodeList.Add(startNode);
 
         Find();
+        
     }
 
     #region 목표지점을 갈 수 있는지 체크
@@ -160,6 +164,7 @@ public class Jps
             }
 
             openNodeList.Remove(currentNode);
+
             closeNodeList.Add(currentNode);
 
 
@@ -923,7 +928,7 @@ public class Jps
         int y = Mathf.Abs(_currPosition.y - _endPosition.y);
         int reming = Mathf.Abs(x - y);
 
-        return _moveDiagonalCost * Mathf.Min(x, y) + _moveStraightCost * reming;
+        return addCost[_currPosition.x-GameManager.inst.mapMinX,_currPosition.y-GameManager.inst.mapMinY]+(_moveDiagonalCost * Mathf.Min(x, y)) + (_moveStraightCost * reming);
     }
 
     public bool MapSizeCheck(int _x, int _y)
@@ -934,7 +939,6 @@ public class Jps
 
     private void AddOpenList(Node _currentNode, Node _parentNode)
     {
-        int nextCost = _parentNode.gCost + Heuristic(_parentNode.Pos(), _currentNode.Pos());
         _currentNode.parentNode = _parentNode;
         _currentNode.gCost = _parentNode.gCost + Heuristic(_parentNode.Pos(), _currentNode.Pos());
         _currentNode.hCost = Heuristic(_currentNode.Pos(), endPos);

@@ -30,14 +30,16 @@ public class Astar
 
     readonly int _moveStraightCost = 10;
     readonly int _moveDiagonalCost = 14;
+    public int[,] addCost;
 
-    public Astar(Vector3Int _startPos, Vector3Int _endPos, AstarOption _option = AstarOption.None)
+    public Astar(Vector3Int _startPos, Vector3Int _endPos,int[,] _addCost, AstarOption _option = AstarOption.None)
     {
         if (_startPos == _endPos)
         {
             return;
         }
 
+        addCost = _addCost;
         nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
 
         startPos = _startPos;
@@ -61,7 +63,7 @@ public class Astar
             int x = Mathf.Abs(_currPosition.x - _endPosition.x);
             int y = Mathf.Abs(_currPosition.y - _endPosition.y);
             int reming = Mathf.Abs(x - y);
-            return _moveDiagonalCost * Mathf.Min(x, y) + _moveStraightCost * reming;
+            return addCost[_currPosition.x-GameManager.inst.mapMinX,_currPosition.y-GameManager.inst.mapMinY]+_moveDiagonalCost * Mathf.Min(x, y) + _moveStraightCost * reming;
         }
 
         return (Mathf.Abs(_currPosition.x - _endPosition.x) + Mathf.Abs(_currPosition.y - _endPosition.y)) * 10;

@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class MoveMent_Jps : MonoBehaviour
@@ -18,7 +21,9 @@ public class MoveMent_Jps : MonoBehaviour
     public Coroutine MoveCo;
     public Jps jps;
     public int bugCheck;
+    public int[,] addCost;
 
+    
 
     [ContextMenu("PosSet")]
     void PosSet()
@@ -97,11 +102,14 @@ public class MoveMent_Jps : MonoBehaviour
 
     IEnumerator Co_Move()
     {
+        
+        addCost = new int[GameManager.inst.sizeX, GameManager.inst.sizeY];
         bugCheck = 0;
-        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),addCost);
         moveNode = jps.finalNodeList;
         movePos = (Vector2Int)jps.endPos;
 
+        
         Vector3 targetPos;
         if (moveNode.Count <= 1)
         {
@@ -124,12 +132,14 @@ public class MoveMent_Jps : MonoBehaviour
             if (Vector3.Distance(transform.position, targetPos) <= 0.01f)
             {
                 transform.position = targetPos;
+                addCost[(int)transform.position.x-GameManager.inst.mapMinX, (int)transform.position.y-GameManager.inst.mapMinY] += 10;
                 if (transform.position == new Vector3Int(movePos.x, movePos.y))
                 {
                     break;
                 }
 
-                jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+                jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),addCost);
+                
                 moveNode = jps.finalNodeList;
                 movePos = (Vector2Int)jps.endPos;
                 if (moveNode.Count <= 1)
@@ -143,7 +153,7 @@ public class MoveMent_Jps : MonoBehaviour
                         yield return new WaitForSeconds(1f);
                         ani.SetBool(IsMoving, true);
                         bugCheck++;
-                        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+                        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),addCost);
                         moveNode = jps.finalNodeList;
                         movePos = (Vector2Int)jps.endPos;
                         continue;
