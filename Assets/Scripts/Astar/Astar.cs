@@ -28,7 +28,7 @@ public class Astar
     public Node currentNode;
     public Node endNode;
 
-    public Dictionary<Vector2Int, Node> nodeCheck = new Dictionary<Vector2Int, Node>();
+    public Node[,] nodeArray;
 
     readonly int _moveStraightCost = 10;
     readonly int _moveDiagonalCost = 14;
@@ -39,6 +39,7 @@ public class Astar
         {
             return;
         }
+        nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
 
         startPos = _startPos;
         
@@ -47,10 +48,10 @@ public class Astar
         option = _option;
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = Heuristic(startPos, endPos);
-        nodeCheck.Add(new Vector2Int(startPos.x,startPos.y),startNode);
-        endNode = new Node(_endPos.x, _endPos.y);
-        nodeCheck.Add(new Vector2Int(_endPos.x,_endPos.y),endNode);
+        nodeArray[_startPos.x - GameManager.inst.mapMinX, _startPos.y - GameManager.inst.mapMinY] =
+            new Node(_startPos.x, _startPos.y);
         openNodeList.Add(startNode);
+        startNode.openContains = true;
         Find();
     }
 
@@ -156,10 +157,13 @@ public class Astar
             }
 
             closeNodeList.Add(currentNode);
+            currentNode.closeContains = true;
             openNodeList.Remove(currentNode);
+            currentNode.openContains = false;
 
-            if (currentNode == endNode||Physics2D.OverlapCircle(new Vector2(endPos.x,endPos.y),0.4f,GameManager.inst.dontMoveLayerMask)&&currentNode.hCost<=14)
+            if (currentNode.Pos() == endPos||Physics2D.OverlapCircle(new Vector2(endPos.x,endPos.y),0.4f,GameManager.inst.dontMoveLayerMask)&&currentNode.hCost<=14)
             {
+                endNode = currentNode;
                 Node targetNode = currentNode;
                 // if (endNode.parentNode == null)
                 // {
@@ -213,80 +217,72 @@ public class Astar
             finalNodeList.Reverse();
         }
     }
-
-    private void OpenListAdd(int checkX, int checkY, bool cross = false)
+    public bool MapSizeCheck(int _x, int _y)
     {
-        if (!(checkX >= GameManager.inst.mapMinX && checkX <= GameManager.inst.mapMaxX &&
-              checkY >= GameManager.inst.mapMinY && checkY <= GameManager.inst.mapMaxY))
+        return _x >= GameManager.inst.mapMinX && _x <= GameManager.inst.mapMaxX && _y >= GameManager.inst.mapMinY &&
+               _y <= GameManager.inst.mapMaxY;
+    }
+    
+    
+    public Node GetNode(int _x, int _y)
+    {
+        int x = _x - GameManager.inst.mapMinX;
+        int y = _y - GameManager.inst.mapMinY;
+        if (nodeArray[x,y]!=null)
         {
-            return;
+            return nodeArray[x,y];
         }
-
-        if (GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY].isWall)
+        
+        nodeArray[x,y] = new Node(_x,_y);
+        bool isDontMove = false;
+        if (MapSizeCheck(_x, _y))
         {
-            return;
-        }
-
-        Node checkNode;
-        if (nodeCheck.ContainsKey(new Vector2Int(checkX, checkY)))
-        {
-            checkNode = nodeCheck[new Vector2Int(checkX, checkY)];
+            if (Physics2D.OverlapCircle(new Vector2(_x, _y), 0.4f, GameManager.inst.dontMoveLayerMask))
+            {
+                isDontMove = true;
+            }
         }
         else
         {
-            checkNode = new Node(checkX, checkY);
-            nodeCheck.Add(new Vector2Int(checkX,checkY),checkNode);
+            isDontMove = true;
         }
-        if (closeNodeList.Contains(checkNode))
+
+        nodeArray[x,y].isDontMove = isDontMove;
+
+
+        return nodeArray[x,y];
+    }
+    
+    private void OpenListAdd(int checkX, int checkY, bool cross = false)
+    {
+        if (!(MapSizeCheck(checkX,checkY)))
         {
             return;
         }
-
-        if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.4f, GameManager.inst.dontMoveLayerMask))
+        Node checkNode=GetNode(checkX, checkY);
+        if (checkNode.isDontMove)
+        {
+            return;
+        }
+        if (checkNode.closeContains)
         {
             return;
         }
 
         if (cross && option != AstarOption.None)
         {
-            if (GameManager.inst
-                    .nodeArray[currentNode.gridX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY]
-                    .isWall && GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX,
-                    currentNode.gridY - GameManager.inst.mapMinY].isWall)
-            {
-                return;
-            }
-            
-            if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
-                    GameManager.inst.dontMoveLayerMask) &&
-                Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
-                    GameManager.inst.dontMoveLayerMask))
+            if (GetNode(currentNode.gridX, checkY).isDontMove && GetNode(checkX, currentNode.gridY).isDontMove)
             {
                 return;
             }
 
             if (option == AstarOption.AllowDiagonal_DontCross)
             {
-                if (GameManager.inst
-                        .nodeArray[currentNode.gridX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY]
-                        .isWall)
+                if (GetNode(currentNode.gridX, checkY).isDontMove && GetNode(checkX, currentNode.gridY).isDontMove)
                 {
                     return;
                 }
-                
-                if (GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX,
-                        currentNode.gridY - GameManager.inst.mapMinY].isWall)
-                {
-                    return;
-                }
-                if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
-                        GameManager.inst.dontMoveLayerMask))
-                {
-                    return;
-                }
-
-                if (Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
-                        GameManager.inst.dontMoveLayerMask))
+                if (GetNode(checkX, currentNode.gridY).isDontMove)
                 {
                     return;
                 }
@@ -295,7 +291,7 @@ public class Astar
         
         int moveCost=currentNode.gCost +
                      (cross == true ? 14 : 10);
-        if (moveCost < checkNode.gCost || !openNodeList.Contains(checkNode))
+        if (moveCost < checkNode.gCost || !checkNode.openContains)
         {
 
             checkNode.gCost = moveCost;
@@ -303,6 +299,7 @@ public class Astar
             checkNode.hCost = Heuristic(new Vector3Int(checkNode.gridX, checkNode.gridY), endPos);
             checkNode.parentNode = currentNode;
             openNodeList.Add(checkNode);
+            checkNode.openContains = true;
         }
     }
 }

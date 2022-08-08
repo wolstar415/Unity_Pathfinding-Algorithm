@@ -9,18 +9,24 @@ public class Node
 
     public int gCost;
     public int hCost;
-    public bool isWall;
+
+    public bool openContains; // Astar사용
+    public bool closeContains; //Astar사용
+
+    public bool isOpen;
+    public bool isDontMove;
+
 
     public int fCost
     {
         get { return gCost + hCost; }
     }
 
-    public Node(int _gridX, int _gridY,bool _isWall=false)
+    public Node(int _gridX, int _gridY)
     {
         gridX = _gridX;
         gridY = _gridY;
-        isWall = _isWall;
+        gCost = int.MaxValue;
     }
 
     public Vector3Int Pos()

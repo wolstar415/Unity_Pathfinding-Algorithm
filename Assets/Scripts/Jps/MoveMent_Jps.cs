@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -20,14 +21,18 @@ public class MoveMent_Jps : MonoBehaviour
 
     public Vector2Int movePos;
     public Coroutine MoveCo;
-    public AstarOption option;
-    public Astar aStar;
-    public bool bugCheck = false;
+    public Jps jps;
+    public int bugCheck;
 
 
     [ContextMenu("PosSet")]
     void PosSet()
     {
+        if (MoveCo != null)
+        {
+            StopCoroutine(MoveCo);
+            MoveCo = null;
+        }
         transform.position = new Vector3(Random.Range(GameManager.inst.mapMinX, GameManager.inst.mapMaxX),
             Random.Range(GameManager.inst.mapMinY, GameManager.inst.mapMaxY));
     }
@@ -45,22 +50,29 @@ public class MoveMent_Jps : MonoBehaviour
     }
 
     [ContextMenu("MoveRandom")]
-    void MoveRandom()
+    async void MoveRandom()
     {
         if (MoveCo != null)
         {
             StopCoroutine(MoveCo);
-            transform.position = Vector3Int.FloorToInt(transform.position);
+            MoveCo = null;
         }
-
+        await Task.Yield();
+        transform.position = Vector3Int.FloorToInt(transform.position);
         movePos = new Vector2Int(Random.Range(GameManager.inst.mapMinX, GameManager.inst.mapMaxX),
             Random.Range(GameManager.inst.mapMinY, GameManager.inst.mapMaxY));
         MovePos();
     }
 
     [ContextMenu("MovePos")]
-    void MovePos()
+    async void MovePos()
     {
+        if (MoveCo != null)
+        {
+            StopCoroutine(MoveCo);
+            MoveCo = null;
+        }
+        await Task.Yield();
         MoveCo = StartCoroutine(Co_Move());
     }
 
@@ -82,14 +94,26 @@ public class MoveMent_Jps : MonoBehaviour
         {
             MovePos();
         }
+        
     }
+
+
+    
+    
 
     IEnumerator Co_Move()
     {
-        bugCheck = false;
-        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
-        moveNode = aStar.finalNodeList;
-        movePos = (Vector2Int)aStar.endPos;
+ 
+        
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        bugCheck=0;
+        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+        moveNode = jps.finalNodeList;
+        movePos = (Vector2Int)jps.endPos;
+        sw.Stop();
+        Debug.Log($"{sw.ElapsedMilliseconds.ToString()}ms");
+        Vector3 targetPos;
         if (moveNode.Count <= 1)
         {
             MoveCo = null;
@@ -102,38 +126,36 @@ public class MoveMent_Jps : MonoBehaviour
             .normalized;
         ani.SetFloat(Horizontal, dir.x);
         ani.SetFloat(Vertical, dir.y);
+        targetPos = transform.position + Vector3Int.RoundToInt(dir);
         yield return null;
         do
         {
-            transform.position = Vector3.MoveTowards(transform.position,
-                new Vector3(moveNode[1].gridX, moveNode[1].gridY), Time.deltaTime * moveSpeed);
+            transform.position = Vector3.MoveTowards(transform.position,targetPos, Time.deltaTime * moveSpeed);
 
-            if (Vector3.Distance(transform.position, new Vector3(moveNode[1].gridX, moveNode[1].gridY)) <= 0.01f)
+            if (Vector3.Distance(transform.position, targetPos) <= 0.01f)
             {
-                transform.position = new Vector3(moveNode[1].gridX, moveNode[1].gridY);
+                transform.position = targetPos;
                 if (transform.position == new Vector3Int(movePos.x, movePos.y))
                 {
                     break;
                 }
 
-                aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
-                    option);
-                moveNode = aStar.finalNodeList;
-                movePos = (Vector2Int)aStar.endPos;
+                jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+                moveNode = jps.finalNodeList;
+                movePos = (Vector2Int)jps.endPos;
                 if (moveNode.Count <= 1)
                 {
                     #region  버그방지
                     //목표지점에 못갔는데 딴 플레이어의 이동때문에 이동경로가 막혀서 멈춰있을 때 버그 방지용
-                    if (bugCheck == false && transform.position != new Vector3Int(movePos.x, movePos.y))
+                    if (bugCheck<2 && transform.position != new Vector3Int(movePos.x, movePos.y))
                     {
                         ani.SetBool(IsMoving, false);
                         yield return new WaitForSeconds(1f);
                         ani.SetBool(IsMoving, true);
-                        bugCheck = true;
-                        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
-                            option);
-                        moveNode = aStar.finalNodeList;
-                        movePos = (Vector2Int)aStar.endPos;
+                        bugCheck++;
+                        jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
+                        moveNode = jps.finalNodeList;
+                        movePos = (Vector2Int)jps.endPos;
                         continue;
                     }
                     else
@@ -150,6 +172,7 @@ public class MoveMent_Jps : MonoBehaviour
                     .normalized;
                 ani.SetFloat(Horizontal, dir.x);
                 ani.SetFloat(Vertical, dir.y);
+                targetPos = transform.position + Vector3Int.RoundToInt(dir);
             }
 
             yield return null;
@@ -158,7 +181,8 @@ public class MoveMent_Jps : MonoBehaviour
         ani.SetBool(IsMoving, false);
         MoveCo = null;
         moveNode.Clear();
-        aStar = null;
+        
+
     }
 
     void OnDrawGizmos()
@@ -175,5 +199,7 @@ public class MoveMent_Jps : MonoBehaviour
         {
             Gizmos.DrawSphere(new Vector3(movePos.x, movePos.y), 0.5f);
         }
+
+        
     }
 }

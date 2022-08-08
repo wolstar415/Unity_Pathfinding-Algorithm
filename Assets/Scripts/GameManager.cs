@@ -22,36 +22,14 @@ public class GameManager : MonoBehaviour
         
         sizeX = mapMaxX - mapMinX + 1;
         sizeY = mapMaxY - mapMinY + 1;
-        nodeArray = new Node[sizeX, sizeY];
-
-        for (int i = 0; i < sizeX; i++)
-        {
-            for (int j = 0; j < sizeY; j++)
-            {
-                bool isWall = false;
-                foreach (Collider2D col in Physics2D.OverlapCircleAll(new Vector2(i + mapMinX, j + mapMinY), 0.4f))
-                    if (col.gameObject.layer == wallLayerMask)
-                    {
-                        isWall = true;
-                    }
-
-                nodeArray[i, j] = new Node( i + mapMinX, j + mapMinY,isWall);
-            }
-        }
     }
 
-    [field: SerializeField]
-    public int mapMaxX { get; private set; }
-    [field: SerializeField]
-    public int mapMaxY { get; private set; }
-    [field: SerializeField]
-    public int mapMinX { get; private set; }
-    [field: SerializeField]
-    public int mapMinY { get; private set; }
-    [field: SerializeField]
-    public int sizeX { get; private set; }
-    [field: SerializeField]
-    public int sizeY { get; private set; }
+    public int mapMaxX;
+    public int mapMaxY;
+    public int mapMinX;
+    public int mapMinY;
+    public int sizeX;
+    public int sizeY;
 
     public Tilemap tilemap;
 }
