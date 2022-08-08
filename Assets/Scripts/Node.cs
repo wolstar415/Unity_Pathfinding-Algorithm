@@ -9,16 +9,18 @@ public class Node
 
     public int gCost;
     public int hCost;
+    public bool isWall;
 
     public int fCost
     {
         get { return gCost + hCost; }
     }
 
-    public Node(int _gridX, int _gridY)
+    public Node(int _gridX, int _gridY,bool _isWall=false)
     {
         gridX = _gridX;
         gridY = _gridY;
+        isWall = _isWall;
     }
 
     public Vector3Int Pos()

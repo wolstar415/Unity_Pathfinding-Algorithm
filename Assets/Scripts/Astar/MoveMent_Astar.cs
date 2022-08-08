@@ -86,8 +86,12 @@ public class MoveMent_Astar : MonoBehaviour
 
     IEnumerator Co_Move()
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
         bugCheck = 0;
         aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
+        sw.Stop();
+        Debug.Log(sw.ElapsedMilliseconds.ToString()+"ms");
         moveNode = aStar.finalNodeList;
         movePos = (Vector2Int)aStar.endPos;
         if (moveNode.Count <= 1)

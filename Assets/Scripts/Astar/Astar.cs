@@ -41,12 +41,15 @@ public class Astar
         }
 
         startPos = _startPos;
+        
 
         endPos = endCheck(_endPos); //목표지점을 갈 수 있는지 체크
         option = _option;
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = Heuristic(startPos, endPos);
-        nodeCheck.Add(new Vector2Int(startPos.x, startPos.y), startNode);
+        nodeCheck.Add(new Vector2Int(startPos.x,startPos.y),startNode);
+        endNode = new Node(_endPos.x, _endPos.y);
+        nodeCheck.Add(new Vector2Int(_endPos.x,_endPos.y),endNode);
         openNodeList.Add(startNode);
         Find();
     }
@@ -88,8 +91,10 @@ public class Astar
 
             checkNodeList.Remove(cur);
 
-
+            
+            
             if (Physics2D.OverlapCircle(new Vector2(cur.gridX, cur.gridY), 0.4f, GameManager.inst.wallLayerMask))
+                
             {
                 if (!check2.ContainsKey(new Vector2Int(cur.gridX - 1, cur.gridY)))
                 {
@@ -153,10 +158,13 @@ public class Astar
             closeNodeList.Add(currentNode);
             openNodeList.Remove(currentNode);
 
-            if (currentNode.gridX == endPos.x && currentNode.gridY == endPos.y)
+            if (currentNode == endNode||Physics2D.OverlapCircle(new Vector2(endPos.x,endPos.y),0.4f,GameManager.inst.dontMoveLayerMask)&&currentNode.hCost<=14)
             {
-                endNode = currentNode;
-                Node targetNode = endNode;
+                Node targetNode = currentNode;
+                // if (endNode.parentNode == null)
+                // {
+                //     Debug.Log("?");
+                // }
                 while (targetNode != startNode)
                 {
                     finalNodeList.Add(targetNode);
@@ -182,7 +190,7 @@ public class Astar
             }
         }
 
-        if (endNode == null)
+        if (finalNodeList.Count==0)
             //없을경우 가장 가까운 거리로 설정
         {
             Node checkNode = closeNodeList[0];
@@ -214,11 +222,25 @@ public class Astar
             return;
         }
 
-        if (nodeCheck.ContainsKey(new Vector2Int(checkX, checkY)))
+        if (GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY].isWall)
         {
             return;
         }
 
+        Node checkNode;
+        if (nodeCheck.ContainsKey(new Vector2Int(checkX, checkY)))
+        {
+            checkNode = nodeCheck[new Vector2Int(checkX, checkY)];
+        }
+        else
+        {
+            checkNode = new Node(checkX, checkY);
+            nodeCheck.Add(new Vector2Int(checkX,checkY),checkNode);
+        }
+        if (closeNodeList.Contains(checkNode))
+        {
+            return;
+        }
 
         if (Physics2D.OverlapCircle(new Vector2(checkX, checkY), 0.4f, GameManager.inst.dontMoveLayerMask))
         {
@@ -227,6 +249,14 @@ public class Astar
 
         if (cross && option != AstarOption.None)
         {
+            if (GameManager.inst
+                    .nodeArray[currentNode.gridX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY]
+                    .isWall && GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX,
+                    currentNode.gridY - GameManager.inst.mapMinY].isWall)
+            {
+                return;
+            }
+            
             if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
                     GameManager.inst.dontMoveLayerMask) &&
                 Physics2D.OverlapCircle(new Vector2(checkX, currentNode.gridY), 0.4f,
@@ -237,6 +267,18 @@ public class Astar
 
             if (option == AstarOption.AllowDiagonal_DontCross)
             {
+                if (GameManager.inst
+                        .nodeArray[currentNode.gridX - GameManager.inst.mapMinX, checkY - GameManager.inst.mapMinY]
+                        .isWall)
+                {
+                    return;
+                }
+                
+                if (GameManager.inst.nodeArray[checkX - GameManager.inst.mapMinX,
+                        currentNode.gridY - GameManager.inst.mapMinY].isWall)
+                {
+                    return;
+                }
                 if (Physics2D.OverlapCircle(new Vector2(currentNode.gridX, checkY), 0.4f,
                         GameManager.inst.dontMoveLayerMask))
                 {
@@ -250,14 +292,17 @@ public class Astar
                 }
             }
         }
+        
+        int moveCost=currentNode.gCost +
+                     (cross == true ? 14 : 10);
+        if (moveCost < checkNode.gCost || !openNodeList.Contains(checkNode))
+        {
 
-        Node checkNode = new Node(checkX, checkY);
-        checkNode.gCost = currentNode.gCost +
-                          (cross == true ? 14 : 10);
-        //checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
-        checkNode.hCost = Heuristic(new Vector3Int(checkNode.gridX, checkNode.gridY), endPos);
-        checkNode.parentNode = currentNode;
-        openNodeList.Add(checkNode);
-        nodeCheck.Add(new Vector2Int(checkX, checkY), checkNode);
+            checkNode.gCost = moveCost;
+            //checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
+            checkNode.hCost = Heuristic(new Vector3Int(checkNode.gridX, checkNode.gridY), endPos);
+            checkNode.parentNode = currentNode;
+            openNodeList.Add(checkNode);
+        }
     }
 }

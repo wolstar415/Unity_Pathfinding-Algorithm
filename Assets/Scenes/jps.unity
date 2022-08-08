@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontMoveLayerMask:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 448
   wallLayerMask:
     serializedVersion: 2
     m_Bits: 64
@@ -162,6 +162,8 @@ MonoBehaviour:
   <mapMaxY>k__BackingField: 0
   <mapMinX>k__BackingField: 0
   <mapMinY>k__BackingField: 0
+  <sizeX>k__BackingField: 0
+  <sizeY>k__BackingField: 0
   tilemap: {fileID: 768986966}
 --- !u!4 &65928489
 Transform:
@@ -597,16 +599,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &314358477
 Transform:
@@ -980,16 +985,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &734664195
 Transform:
@@ -8579,16 +8587,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1212481297
 Transform:
@@ -8824,16 +8835,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1213065291
 Transform:
@@ -9249,16 +9263,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1413932113
 Transform:
@@ -9422,16 +9439,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1432965673
 Transform:
@@ -9639,16 +9659,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1557632610
 Transform:
@@ -9812,16 +9835,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1564119491
 Transform:
@@ -9985,16 +10011,19 @@ MonoBehaviour:
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     currentNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
     endNode:
       gridX: 0
       gridY: 0
       gCost: 0
       hCost: 0
+      isWall: 0
   bugCheck: 0
 --- !u!4 &1841140326
 Transform:
