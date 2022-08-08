@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 [System.Serializable]
 public class Jps
@@ -25,7 +22,7 @@ public class Jps
     {
         nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
         startPos = _startPos;
-        endPos = endCheck(_endPos);
+        endPos = EndCheck(_endPos);
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = Heuristic(startPos, endPos);
         startNode.isOpen = true;
@@ -40,7 +37,7 @@ public class Jps
 
     #region 목표지점을 갈 수 있는지 체크
 
-    private Vector3Int endCheck(Vector3Int check)
+    private Vector3Int EndCheck(Vector3Int check)
     {
         //PriorityQueue< Node, int > checkQueue = new PriorityQueue< Node, int >();
         List<Node> checkNodeList = new List<Node>();
@@ -110,36 +107,36 @@ public class Jps
 
     #endregion
 
-    
+
     public Node GetNode(int _x, int _y)
     {
         int x = _x - GameManager.inst.mapMinX;
         int y = _y - GameManager.inst.mapMinY;
-        if (nodeArray[x,y]!=null)
+        if (nodeArray[x, y] != null)
         {
-            return nodeArray[x,y];
+            return nodeArray[x, y];
         }
-        
-        nodeArray[x,y] = new Node(_x,_y);
+
+        nodeArray[x, y] = new Node(_x, _y);
         bool isMoveAble = true;
         if (MapSizeCheck(_x, _y))
         {
             if (Physics2D.OverlapCircle(new Vector2(_x, _y), 0.4f, GameManager.inst.dontMoveLayerMask))
             {
                 isMoveAble = false;
-                nodeArray[x,y].isDontMove = true;
+                nodeArray[x, y].isDontMove = true;
             }
         }
         else
         {
             isMoveAble = false;
-            nodeArray[x,y].isDontMove = true;
+            nodeArray[x, y].isDontMove = true;
         }
 
-        nodeArray[x,y].isOpen = isMoveAble;
+        nodeArray[x, y].isOpen = isMoveAble;
 
 
-        return nodeArray[x,y];
+        return nodeArray[x, y];
     }
 
     public bool EndCheck(Node _currentNode)
@@ -219,6 +216,8 @@ public class Jps
         }
     }
 
+    #region 오른쪽
+
     private bool Right(Node _startNode, bool _isMovealbe = false)
     {
         int x = _startNode.gridX;
@@ -232,7 +231,6 @@ public class Jps
         {
             _currentNode.isOpen = _isMovealbe;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x + 1, y) == false) // 탐색 가능 여부
             {
@@ -259,13 +257,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 위쪽이 막혀 있으면서 오른쪽 위는 뚫려있는 경우
+            #region ↑ 벽 ,↗ 이동가능
 
             if (MapSizeCheck(x + 1, y + 1))
             {
-                if (GetNode(x, y + 1).isDontMove && GetNode(x + 1, y + 1).isDontMove == false) // ↑ 벽 ,↗ 이동가능
+                if (GetNode(x, y + 1).isDontMove && GetNode(x + 1, y + 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -279,11 +276,11 @@ public class Jps
 
             #endregion
 
-            #region 위쪽이 막혀 있으면서 오른쪽 아래는 뚫려있는 경우
+            #region ↓ 벽 ,↘ 이동가능
 
             if (MapSizeCheck(x + 1, y - 1))
             {
-                if (GetNode(x, y - 1).isDontMove && GetNode(x + 1, y - 1).isDontMove == false) // ↓ 벽 ,↘ 이동가능
+                if (GetNode(x, y - 1).isDontMove && GetNode(x + 1, y - 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -302,6 +299,10 @@ public class Jps
         return isFind;
     }
 
+    #endregion
+
+    #region 왼쪽
+
     private bool Left(Node _startNode, bool _isMovealbe = false)
     {
         int x = _startNode.gridX;
@@ -315,7 +316,6 @@ public class Jps
         {
             _currentNode.isOpen = _isMovealbe;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x - 1, y) == false) // 탐색 가능 여부
             {
@@ -341,9 +341,8 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 위쪽이 막혀 있으면서 왼쪽 위는 뚫려있는 경우
+            #region ↑벽,↖이동가능
 
             if (MapSizeCheck(x - 1, y + 1))
             {
@@ -361,11 +360,11 @@ public class Jps
 
             #endregion
 
-            #region 위쪽이 막혀 있으면서 왼쪽 아래는 뚫려있는 경우
+            #region ↓벽,↙이동가능
 
             if (MapSizeCheck(x - 1, y - 1))
             {
-                if (GetNode(x, y - 1).isDontMove && GetNode(x - 1, y - 1).isDontMove == false) // ↓벽,↙이동가능
+                if (GetNode(x, y - 1).isDontMove && GetNode(x - 1, y - 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -384,6 +383,10 @@ public class Jps
         return isFind;
     }
 
+    #endregion
+
+    #region 위
+
     private bool Up(Node _startNode, bool _isMovealbe = false)
     {
         int x = _startNode.gridX;
@@ -397,7 +400,6 @@ public class Jps
         {
             _currentNode.isOpen = _isMovealbe;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x, y + 1) == false) // 탐색 가능 여부
             {
@@ -423,13 +425,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 오른쪽 막혀 있으면서 왼쪽 위는 뚫려있는 경우
+            #region →벽,↗이동가능
 
             if (MapSizeCheck(x + 1, y + 1))
             {
-                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y + 1).isDontMove == false) // →벽,↗이동가능
+                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y + 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -443,11 +444,11 @@ public class Jps
 
             #endregion
 
-            #region 왼쪽이 막혀 있으면서 왼쪽 아래는 뚫려있는 경우
+            #region ←벽,↖이동가능
 
             if (MapSizeCheck(x - 1, y + 1))
             {
-                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y + 1).isDontMove == false) // ←벽,↖이동가능
+                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y + 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -466,6 +467,10 @@ public class Jps
         return isFind;
     }
 
+    #endregion
+
+    #region 아래
+
     private bool Down(Node _startNode, bool _isMovealbe = false)
     {
         int x = _startNode.gridX;
@@ -479,7 +484,6 @@ public class Jps
         {
             _currentNode.isOpen = _isMovealbe;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x, y - 1) == false) // 탐색 가능 여부
             {
@@ -505,13 +509,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 위쪽이 막혀 있으면서 왼쪽 위는 뚫려있는 경우
+            #region →벽,↘이동가능
 
             if (MapSizeCheck(x + 1, y - 1))
             {
-                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y - 1).isDontMove == false) // →벽,↘이동가능
+                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y - 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -525,11 +528,11 @@ public class Jps
 
             #endregion
 
-            #region 위쪽이 막혀 있으면서 왼쪽 아래는 뚫려있는 경우
+            #region ←벽,↙이동가능
 
             if (MapSizeCheck(x - 1, y - 1))
             {
-                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y - 1).isDontMove == false) // ←벽,↙이동가능
+                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y - 1).isDontMove == false)
                 {
                     if (_isMovealbe == false)
                     {
@@ -548,8 +551,10 @@ public class Jps
         return isFind;
     }
 
+    #endregion
 
-    #region 오른쪽 위 대각선 검사
+
+    #region 오른쪽 위
 
     private void RightUp(Node _startNode)
     {
@@ -564,7 +569,6 @@ public class Jps
         {
             _currentNode.isOpen = false;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x + 1, y + 1) == false) // 탐색 가능 여부
             {
@@ -572,7 +576,7 @@ public class Jps
             }
 
 
-            _currentNode = GetNode(++x, ++y); // 다음 왼쪽 노드로 이동
+            _currentNode = GetNode(++x, ++y);
 
 
             if (GetNode(x - 1, y).isDontMove && GetNode(x, y - 1).isDontMove) //양쪽 막혀있음
@@ -592,14 +596,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-
-            #region 왼쪽이 막혀 있으면서 왼쪽 위가 막혀있지 않은 경우
+            #region ←벽,↖이동가능
 
             if (MapSizeCheck(x - 1, y + 1))
             {
-                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y + 1).isDontMove == false) // ←벽,↖이동가능
+                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y + 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -609,11 +611,11 @@ public class Jps
 
             #endregion
 
-            #region 아래가 막혀 있으면서 오른쪽 아래가 안막혔으면
+            #region ↓벽,↘이동가능
 
             if (MapSizeCheck(x + 1, y - 1))
             {
-                if (GetNode(x, y - 1).isDontMove && GetNode(x + 1, y - 1).isDontMove == false) // ↓벽,↘이동가능
+                if (GetNode(x, y - 1).isDontMove && GetNode(x + 1, y - 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -643,7 +645,7 @@ public class Jps
 
     #endregion
 
-    #region 오른쪽 아래 대각선 검사
+    #region 오른쪽 아래
 
     private void RightDown(Node _startNode)
     {
@@ -658,7 +660,6 @@ public class Jps
         {
             _currentNode.isOpen = false;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x + 1, y - 1) == false) // 탐색 가능 여부
             {
@@ -666,7 +667,7 @@ public class Jps
             }
 
 
-            _currentNode = GetNode(++x, --y); // 다음 왼쪽 노드로 이동
+            _currentNode = GetNode(++x, --y);
 
 
             if (_currentNode.isOpen == false)
@@ -686,13 +687,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 왼쪽이 막혀있고 왼쪽 아래가 막혀 있지 않으면
+            #region ←벽,↙이동가능
 
             if (MapSizeCheck(x - 1, y - 1))
             {
-                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y - 1).isDontMove == false) // ←벽,↙이동가능
+                if (GetNode(x - 1, y).isDontMove && GetNode(x - 1, y - 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -702,11 +702,11 @@ public class Jps
 
             #endregion
 
-            #region 위쪽이 막혀있고 오른쪽 위가 막혀있지 않으면
+            #region ↑벽,↗이동가능
 
             if (MapSizeCheck(x + 1, y + 1))
             {
-                if (GetNode(x, y + 1).isDontMove && GetNode(x + 1, y + 1).isDontMove == false) // ↑벽,↗이동가능
+                if (GetNode(x, y + 1).isDontMove && GetNode(x + 1, y + 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -736,7 +736,7 @@ public class Jps
 
     #endregion
 
-    #region 왼쪽 위 대각선 검사
+    #region 왼쪽 위
 
     private void LeftUp(Node _startNode)
     {
@@ -751,7 +751,6 @@ public class Jps
         {
             _currentNode.isOpen = false;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x - 1, y + 1) == false) // 탐색 가능 여부
             {
@@ -759,7 +758,7 @@ public class Jps
             }
 
 
-            _currentNode = GetNode(--x, ++y); // 다음 왼쪽 노드로 이동
+            _currentNode = GetNode(--x, ++y);
 
 
             if (_currentNode.isOpen == false)
@@ -778,13 +777,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-            #region 오른쪽이 막혀있고 오른쪽 위가 막혀있지 않으면
+            #region →벽,↗이동가능
 
             if (MapSizeCheck(x + 1, y + 1))
             {
-                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y + 1).isDontMove == false) // →벽,↗이동가능
+                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y + 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -794,11 +792,11 @@ public class Jps
 
             #endregion
 
-            #region 아래가 막혀있고 왼쪽 아래가 막혀있지 않으면
+            #region ↓벽,↙이동가능
 
             if (MapSizeCheck(x - 1, y - 1))
             {
-                if (GetNode(x, y - 1).isDontMove && GetNode(x - 1, y - 1).isDontMove == false) // ↓벽,↙이동가능
+                if (GetNode(x, y - 1).isDontMove && GetNode(x - 1, y - 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -828,7 +826,7 @@ public class Jps
 
     #endregion
 
-    #region 왼쪽 아래 대각선 검사
+    #region 왼쪽 아래
 
     private void LeftDown(Node _startNode)
     {
@@ -843,7 +841,6 @@ public class Jps
         {
             _currentNode.isOpen = false;
 
-            #region 맵 사이즈가 넘어가는지 안 넘어가지는지를 체크
 
             if (MapSizeCheck(x - 1, y - 1) == false) // 탐색 가능 여부
             {
@@ -871,14 +868,12 @@ public class Jps
                 break;
             }
 
-            #endregion
 
-
-            #region 오른쪽이 막혀있고 오른쪽 아래가 막혀있지 않으면
+            #region →벽,↘이동가능
 
             if (MapSizeCheck(x + 1, y - 1))
             {
-                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y - 1).isDontMove == false) // →벽,↘이동가능
+                if (GetNode(x + 1, y).isDontMove && GetNode(x + 1, y - 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 
@@ -888,11 +883,11 @@ public class Jps
 
             #endregion
 
-            #region 위쪽이 막혀있고 왼쪽 위가 막혀있지 않으면
+            #region ↑벽,↖이동가능
 
             if (MapSizeCheck(x - 1, y + 1))
             {
-                if (GetNode(x, y + 1).isDontMove && GetNode(x - 1, y + 1).isDontMove == false) // ↑벽,↖이동가능
+                if (GetNode(x, y + 1).isDontMove && GetNode(x - 1, y + 1).isDontMove == false)
                 {
                     AddOpenList(_currentNode, _startNode);
 

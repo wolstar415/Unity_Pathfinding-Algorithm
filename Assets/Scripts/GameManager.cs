@@ -9,17 +9,17 @@ public class GameManager : MonoBehaviour
     public static GameManager inst;
     public LayerMask dontMoveLayerMask;
     public LayerMask wallLayerMask;
-    public Node[,] nodeArray;
 
     private void Awake()
     {
         inst = this;
-        mapMinX = tilemap.cellBounds.xMin;
-        mapMinY = tilemap.cellBounds.yMin;
-        mapMaxX = tilemap.cellBounds.xMax - 1;
-        mapMaxY = tilemap.cellBounds.yMax - 1;
-        
-        
+        var cellBounds = tilemap.cellBounds;
+        mapMinX = cellBounds.xMin;
+        mapMinY = cellBounds.yMin;
+        mapMaxX = cellBounds.xMax - 1;
+        mapMaxY = cellBounds.yMax - 1;
+
+
         sizeX = mapMaxX - mapMinX + 1;
         sizeY = mapMaxY - mapMinY + 1;
     }

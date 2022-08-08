@@ -13,8 +13,8 @@ public class Node
     public bool openContains; // Astar사용
     public bool closeContains; //Astar사용
 
-    public bool isOpen;
-    public bool isDontMove;
+    public bool isOpen; //jps 사용
+    public bool isDontMove; // jps 사용
 
 
     public int fCost

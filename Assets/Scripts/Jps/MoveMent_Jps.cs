@@ -1,12 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class MoveMent_Jps : MonoBehaviour
@@ -33,6 +28,7 @@ public class MoveMent_Jps : MonoBehaviour
             StopCoroutine(MoveCo);
             MoveCo = null;
         }
+
         transform.position = new Vector3(Random.Range(GameManager.inst.mapMinX, GameManager.inst.mapMaxX),
             Random.Range(GameManager.inst.mapMinY, GameManager.inst.mapMaxY));
     }
@@ -57,6 +53,7 @@ public class MoveMent_Jps : MonoBehaviour
             StopCoroutine(MoveCo);
             MoveCo = null;
         }
+
         await Task.Yield();
         transform.position = Vector3Int.FloorToInt(transform.position);
         movePos = new Vector2Int(Random.Range(GameManager.inst.mapMinX, GameManager.inst.mapMaxX),
@@ -72,6 +69,7 @@ public class MoveMent_Jps : MonoBehaviour
             StopCoroutine(MoveCo);
             MoveCo = null;
         }
+
         await Task.Yield();
         MoveCo = StartCoroutine(Co_Move());
     }
@@ -94,25 +92,16 @@ public class MoveMent_Jps : MonoBehaviour
         {
             MovePos();
         }
-        
     }
 
 
-    
-    
-
     IEnumerator Co_Move()
     {
- 
-        
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
-        bugCheck=0;
+        bugCheck = 0;
         jps = new Jps(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y));
         moveNode = jps.finalNodeList;
         movePos = (Vector2Int)jps.endPos;
-        sw.Stop();
-        Debug.Log($"{sw.ElapsedMilliseconds.ToString()}ms");
+
         Vector3 targetPos;
         if (moveNode.Count <= 1)
         {
@@ -130,7 +119,7 @@ public class MoveMent_Jps : MonoBehaviour
         yield return null;
         do
         {
-            transform.position = Vector3.MoveTowards(transform.position,targetPos, Time.deltaTime * moveSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * moveSpeed);
 
             if (Vector3.Distance(transform.position, targetPos) <= 0.01f)
             {
@@ -145,9 +134,10 @@ public class MoveMent_Jps : MonoBehaviour
                 movePos = (Vector2Int)jps.endPos;
                 if (moveNode.Count <= 1)
                 {
-                    #region  버그방지
+                    #region 버그방지
+
                     //목표지점에 못갔는데 딴 플레이어의 이동때문에 이동경로가 막혀서 멈춰있을 때 버그 방지용
-                    if (bugCheck<2 && transform.position != new Vector3Int(movePos.x, movePos.y))
+                    if (bugCheck < 2 && transform.position != new Vector3Int(movePos.x, movePos.y))
                     {
                         ani.SetBool(IsMoving, false);
                         yield return new WaitForSeconds(1f);
@@ -162,10 +152,8 @@ public class MoveMent_Jps : MonoBehaviour
                     {
                         break;
                     }
-                    
 
                     #endregion
-                    
                 }
 
                 dir = new Vector2(moveNode[1].gridX - moveNode[0].gridX, moveNode[1].gridY - moveNode[0].gridY)
@@ -181,8 +169,6 @@ public class MoveMent_Jps : MonoBehaviour
         ani.SetBool(IsMoving, false);
         MoveCo = null;
         moveNode.Clear();
-        
-
     }
 
     void OnDrawGizmos()
@@ -199,7 +185,5 @@ public class MoveMent_Jps : MonoBehaviour
         {
             Gizmos.DrawSphere(new Vector3(movePos.x, movePos.y), 0.5f);
         }
-
-        
     }
 }

@@ -1,11 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class MoveMent_Astar : MonoBehaviour
@@ -19,7 +14,7 @@ public class MoveMent_Astar : MonoBehaviour
     public float moveSpeed = 2f;
 
     public Vector2Int movePos;
-    public Coroutine MoveCo;
+    private Coroutine _moveCo;
     public AstarOption option;
     public Astar aStar;
     public int bugCheck = 0;
@@ -35,11 +30,11 @@ public class MoveMent_Astar : MonoBehaviour
     [ContextMenu("MoveStop")]
     void MoveStop()
     {
-        if (MoveCo != null)
+        if (_moveCo != null)
         {
             ani.SetBool(IsMoving, false);
-            StopCoroutine(MoveCo);
-            MoveCo = null;
+            StopCoroutine(_moveCo);
+            _moveCo = null;
             transform.position = Vector3Int.FloorToInt(transform.position);
         }
     }
@@ -47,9 +42,9 @@ public class MoveMent_Astar : MonoBehaviour
     [ContextMenu("MoveRandom")]
     void MoveRandom()
     {
-        if (MoveCo != null)
+        if (_moveCo != null)
         {
-            StopCoroutine(MoveCo);
+            StopCoroutine(_moveCo);
             transform.position = Vector3Int.FloorToInt(transform.position);
         }
 
@@ -61,7 +56,7 @@ public class MoveMent_Astar : MonoBehaviour
     [ContextMenu("MovePos")]
     void MovePos()
     {
-        MoveCo = StartCoroutine(Co_Move());
+        _moveCo = StartCoroutine(Co_Move());
     }
 
     private void Update()
@@ -86,18 +81,13 @@ public class MoveMent_Astar : MonoBehaviour
 
     IEnumerator Co_Move()
     {
-
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
         bugCheck = 0;
         aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y), option);
         moveNode = aStar.finalNodeList;
         movePos = (Vector2Int)aStar.endPos;
-        sw.Stop();
-        Debug.Log($"{sw.ElapsedMilliseconds.ToString()}ms");
         if (moveNode.Count <= 1)
         {
-            MoveCo = null;
+            _moveCo = null;
             yield break;
         }
 
@@ -127,15 +117,17 @@ public class MoveMent_Astar : MonoBehaviour
                 movePos = (Vector2Int)aStar.endPos;
                 if (moveNode.Count <= 1)
                 {
-                    #region  버그방지
+                    #region 버그방지
+
                     //목표지점에 못갔는데 딴 플레이어의 이동때문에 이동경로가 막혀서 멈춰있을 때 버그 방지용
-                    if (bugCheck <2 && transform.position != new Vector3Int(movePos.x, movePos.y))
+                    if (bugCheck < 2 && transform.position != new Vector3Int(movePos.x, movePos.y))
                     {
                         ani.SetBool(IsMoving, false);
                         yield return new WaitForSeconds(1f);
                         ani.SetBool(IsMoving, true);
                         bugCheck++;
-                        aStar = new Astar(Vector3Int.FloorToInt(transform.position), new Vector3Int(movePos.x, movePos.y),
+                        aStar = new Astar(Vector3Int.FloorToInt(transform.position),
+                            new Vector3Int(movePos.x, movePos.y),
                             option);
                         moveNode = aStar.finalNodeList;
                         movePos = (Vector2Int)aStar.endPos;
@@ -145,10 +137,8 @@ public class MoveMent_Astar : MonoBehaviour
                     {
                         break;
                     }
-                    
 
                     #endregion
-                    
                 }
 
                 dir = new Vector2(moveNode[1].gridX - moveNode[0].gridX, moveNode[1].gridY - moveNode[0].gridY)
@@ -161,7 +151,7 @@ public class MoveMent_Astar : MonoBehaviour
         } while (moveNode.Count > 1);
 
         ani.SetBool(IsMoving, false);
-        MoveCo = null;
+        _moveCo = null;
         moveNode.Clear();
         aStar = null;
     }

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +5,7 @@ public enum AstarOption
 {
     None = 0,
     AllowDiagonal = 1,
-    AllowDiagonal_DontCross = 2,
+    AllowDiagonalDontCross = 2,
 }
 
 [System.Serializable]
@@ -20,8 +19,7 @@ public class Astar
 
     public List<Node> openNodeList = new List<Node>();
 
-    //PriorityQueue< Node, int > openNodeQueue = new PriorityQueue< Node, int >();
-    //public PriorityQueue< Node, int > closeNodeQueue = new PriorityQueue< Node, int >();
+
     public List<Node> closeNodeList = new List<Node>();
 
     public Node startNode;
@@ -39,10 +37,11 @@ public class Astar
         {
             return;
         }
+
         nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
 
         startPos = _startPos;
-        
+
 
         endPos = endCheck(_endPos); //목표지점을 갈 수 있는지 체크
         option = _option;
@@ -92,10 +91,9 @@ public class Astar
 
             checkNodeList.Remove(cur);
 
-            
-            
+
             if (Physics2D.OverlapCircle(new Vector2(cur.gridX, cur.gridY), 0.4f, GameManager.inst.wallLayerMask))
-                
+
             {
                 if (!check2.ContainsKey(new Vector2Int(cur.gridX - 1, cur.gridY)))
                 {
@@ -146,7 +144,6 @@ public class Astar
     {
         while (openNodeList.Count > 0)
         {
-            //currentNode = openNodeQueue.pop();
             currentNode = openNodeList[0];
             for (int i = 0; i < openNodeList.Count; i++)
             {
@@ -161,14 +158,12 @@ public class Astar
             openNodeList.Remove(currentNode);
             currentNode.openContains = false;
 
-            if (currentNode.Pos() == endPos||Physics2D.OverlapCircle(new Vector2(endPos.x,endPos.y),0.4f,GameManager.inst.dontMoveLayerMask)&&currentNode.hCost<=14)
+            if (currentNode.Pos() == endPos ||
+                Physics2D.OverlapCircle(new Vector2(endPos.x, endPos.y), 0.4f, GameManager.inst.dontMoveLayerMask) &&
+                currentNode.hCost <= 14)
             {
                 endNode = currentNode;
                 Node targetNode = currentNode;
-                // if (endNode.parentNode == null)
-                // {
-                //     Debug.Log("?");
-                // }
                 while (targetNode != startNode)
                 {
                     finalNodeList.Add(targetNode);
@@ -194,8 +189,7 @@ public class Astar
             }
         }
 
-        if (finalNodeList.Count==0)
-            //없을경우 가장 가까운 거리로 설정
+        if (finalNodeList.Count == 0)
         {
             Node checkNode = closeNodeList[0];
             for (int i = 0; i < closeNodeList.Count; i++)
@@ -217,23 +211,24 @@ public class Astar
             finalNodeList.Reverse();
         }
     }
+
     public bool MapSizeCheck(int _x, int _y)
     {
         return _x >= GameManager.inst.mapMinX && _x <= GameManager.inst.mapMaxX && _y >= GameManager.inst.mapMinY &&
                _y <= GameManager.inst.mapMaxY;
     }
-    
-    
+
+
     public Node GetNode(int _x, int _y)
     {
         int x = _x - GameManager.inst.mapMinX;
         int y = _y - GameManager.inst.mapMinY;
-        if (nodeArray[x,y]!=null)
+        if (nodeArray[x, y] != null)
         {
-            return nodeArray[x,y];
+            return nodeArray[x, y];
         }
-        
-        nodeArray[x,y] = new Node(_x,_y);
+
+        nodeArray[x, y] = new Node(_x, _y);
         bool isDontMove = false;
         if (MapSizeCheck(_x, _y))
         {
@@ -247,23 +242,25 @@ public class Astar
             isDontMove = true;
         }
 
-        nodeArray[x,y].isDontMove = isDontMove;
+        nodeArray[x, y].isDontMove = isDontMove;
 
 
-        return nodeArray[x,y];
+        return nodeArray[x, y];
     }
-    
+
     private void OpenListAdd(int checkX, int checkY, bool cross = false)
     {
-        if (!(MapSizeCheck(checkX,checkY)))
+        if (!(MapSizeCheck(checkX, checkY)))
         {
             return;
         }
-        Node checkNode=GetNode(checkX, checkY);
+
+        Node checkNode = GetNode(checkX, checkY);
         if (checkNode.isDontMove)
         {
             return;
         }
+
         if (checkNode.closeContains)
         {
             return;
@@ -276,26 +273,25 @@ public class Astar
                 return;
             }
 
-            if (option == AstarOption.AllowDiagonal_DontCross)
+            if (option == AstarOption.AllowDiagonalDontCross)
             {
                 if (GetNode(currentNode.gridX, checkY).isDontMove && GetNode(checkX, currentNode.gridY).isDontMove)
                 {
                     return;
                 }
+
                 if (GetNode(checkX, currentNode.gridY).isDontMove)
                 {
                     return;
                 }
             }
         }
-        
-        int moveCost=currentNode.gCost +
-                     (cross == true ? 14 : 10);
+
+        int moveCost = currentNode.gCost +
+                       (cross == true ? 14 : 10);
         if (moveCost < checkNode.gCost || !checkNode.openContains)
         {
-
             checkNode.gCost = moveCost;
-            //checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
             checkNode.hCost = Heuristic(new Vector3Int(checkNode.gridX, checkNode.gridY), endPos);
             checkNode.parentNode = currentNode;
             openNodeList.Add(checkNode);
