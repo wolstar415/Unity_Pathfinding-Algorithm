@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
-public class MoveMent : MonoBehaviour
+public class MoveMent_Jps : MonoBehaviour
 {
     public List<Node> moveNode;
     public Animator ani;

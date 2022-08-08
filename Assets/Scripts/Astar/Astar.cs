@@ -235,7 +235,7 @@ public class Astar
 
         Node checkNode = new Node(checkX, checkY);
         checkNode.gCost = currentNode.gCost +
-                          (currentNode.gridX - checkX == 0 || currentNode.gridY - checkY == 0 ? 10 : 14);
+                          (cross == true ? 14 : 10);
         checkNode.hCost = (Mathf.Abs(checkNode.gridX - endPos.x) + Mathf.Abs(checkNode.gridY - endPos.y)) * 10;
         checkNode.parentNode = currentNode;
         openNodeList.Add(checkNode);

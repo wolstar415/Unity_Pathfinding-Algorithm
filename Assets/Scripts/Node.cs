@@ -20,4 +20,9 @@ public class Node
         gridX = _gridX;
         gridY = _gridY;
     }
+
+    public Vector3Int Pos()
+    {
+        return (new Vector3Int(gridX, gridY));
+    }
 }
