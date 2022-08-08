@@ -22,7 +22,7 @@ public class Jps
     {
         nodeArray = new Node[GameManager.inst.sizeX, GameManager.inst.sizeY];
         startPos = _startPos;
-        endPos = EndCheck(_endPos);
+        endPos = EndPosCheck(_endPos);
         startNode = new Node(_startPos.x, _startPos.y);
         startNode.hCost = Heuristic(startPos, endPos);
         startNode.isOpen = true;
@@ -37,7 +37,7 @@ public class Jps
 
     #region 목표지점을 갈 수 있는지 체크
 
-    private Vector3Int EndCheck(Vector3Int check)
+    private Vector3Int EndPosCheck(Vector3Int check)
     {
         //PriorityQueue< Node, int > checkQueue = new PriorityQueue< Node, int >();
         List<Node> checkNodeList = new List<Node>();
